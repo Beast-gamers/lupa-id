@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Vercel
+.vercel/
+.vercelignore
+
+# Env & secrets
+.env
+.env.*
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+
+# Repo-local tooling metadata (not part of the app)
+skills/
+ui-skill/

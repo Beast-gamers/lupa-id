@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('theme');
+        if (saved === 'dark' || (!saved && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     PAGE: HOME (unauthenticated)
+     ═══════════════════════════════════════════════════════ -->
+<div id="page-home">
+  <nav class="home-nav">
+    <a class="home-logo" href="#">
+      <span class="home-logo-icon"><i class="bi bi-shield-lock-fill"></i></span>
+      Lupa ID
+    </a>
+    <div class="home-nav-actions">
+      <button class="btn-nav btn-nav-ghost" onclick="navigate('auth','login')">Log in</button>
+      <button class="btn-nav btn-nav-fill" onclick="navigate('auth','register')">Get started</button>
+    </div>
+  </nav>
+
+  <div class="home-hero">
+    <div class="home-hero-grid">
+      <div class="home-hero-copy">
+        <div class="hero-badge">
+          <span class="hero-badge-dot"></span>
+          One account, every Lupa project
+        </div>
+        <h1>Your identity, <span>secured.</span></h1>
+        <p>Register and verify once, then manage every Lupa project with a single master account.</p>
+        <div class="home-hero-actions">
+          <button class="btn-hero-primary" onclick="navigate('auth','register')"><i class="bi bi-rocket-takeoff me-2"></i>Get started</button>
+          <button class="btn-hero-ghost" onclick="navigate('auth','login')">I have an account</button>
+        </div>
+        <div class="hero-trust">
+          <div class="hero-trust-item"><i class="bi bi-check-circle-fill"></i> Email verified</div>
+          <div class="hero-trust-dot"></div>
+          <div class="hero-trust-item"><i class="bi bi-incognito"></i> Password protected</div>
+        </div>
+      </div>
+
+      <div class="home-hero-visual">
+        <div class="hero-visual-glow"></div>
+        <div class="hero-identity-card">
+          <div class="hero-id-top">
+            <span class="hero-id-brand"><i class="bi bi-shield-lock-fill"></i> Lupa ID</span>
+            <i class="bi bi-patch-check-fill hero-id-verified"></i>
+          </div>
+          <div class="hero-id-divider"></div>
+          <div class="hero-id-body">
+            <div class="hero-id-avatar"><i class="bi bi-person-fill"></i></div>
+            <div class="hero-id-meta">
+              <span class="hero-id-name">Alex Morgan</span>
+              <span class="hero-id-email">alex@example.com</span>
+            </div>
+          </div>
+          <div class="hero-id-chips">
+            <span class="hero-id-chip"><i class="bi bi-check-circle-fill"></i> Verified</span>
+            <span class="hero-id-chip"><i class="bi bi-lock-fill"></i> Secure</span>
+          </div>
+        </div>
+        <div class="hero-float-chip hero-float-1"><i class="bi bi-key-fill"></i> Protected</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     PAGE: AUTH (login / register / verify / forgot / reset)
+     ═══════════════════════════════════════════════════════ -->
+<div id="page-auth" class="hidden">
+  <div class="auth-box">
+    <div class="auth-header">
+      <div class="auth-logo"><i class="bi bi-shield-lock-fill"></i></div>
+      <h2 id="auth-title">Create account</h2>
+      <p id="auth-subtitle">Fill in the details to get started</p>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="sec-register" class="auth-section">
+      <div class="auth-card">
+        <div class="field"><label for="r_username">Username</label><input id="r_username" placeholder="johndoe" autocomplete="username"></div>
+        <div class="field"><label for="r_email">Email</label><input id="r_email" type="email" placeholder="you@example.com" autocomplete="email"></div>
+        <div class="field"><label for="r_password">Password</label><input id="r_password" type="password" placeholder="Min. 8 characters" autocomplete="new-password"></div>
+        <button class="btn-primary w-100" id="registerBtn">Create Account</button>
+      </div>
+      <div class="auth-footer">Already have an account? <button class="btn-ghost" onclick="navigate('auth','login')">Sign in</button></div>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="sec-login" class="auth-section hidden">
+      <div class="auth-card">
+        <div class="field"><label for="l_id">Username or Email</label><input id="l_id" placeholder="johndoe or you@example.com" autocomplete="username"></div>
+        <div class="field"><label for="l_pass">Password</label><input id="l_pass" type="password" placeholder="Enter your password" autocomplete="current-password"></div>
+        <button class="btn-primary w-100" id="loginBtn">Sign In</button>
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <button class="btn-ghost" id="forgotLink">Forgot password?</button>
+        </div>
+      </div>
+      <div class="auth-footer">Don't have an account? <button class="btn-ghost" onclick="navigate('auth','register')">Create one</button></div>
+    </div>
+
+    <!-- VERIFY (OTP only — email pre-filled) -->
+    <div id="sec-verify" class="auth-section hidden">
+      <div class="auth-card auth-card-relative">
+        <button type="button" class="verify-close" id="verifyCloseBtn" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+        <div class="field"><label for="v_email">Email</label><input id="v_email" type="email" class="email-readonly" readonly></div>
+        <div class="field"><label for="v_code">Verification code</label><input id="v_code" class="otp-input" placeholder="000000" autocomplete="one-time-code" inputmode="numeric" maxlength="6"></div>
+        <button class="btn-primary w-100" id="verifyBtn">Verify</button>
+      </div>
+      <div class="auth-footer">Didn't get the code? <button class="btn-ghost" id="resendLink">Resend</button></div>
+    </div>
+
+    <!-- FORGOT PASSWORD -->
+    <div id="sec-forgot" class="auth-section hidden">
+      <div class="auth-card">
+        <div class="field"><label for="fp_email">Email</label><input id="fp_email" type="email" placeholder="you@example.com" autocomplete="email"></div>
+        <button class="btn-primary w-100" id="forgotBtn">Send Reset Code</button>
+      </div>
+      <div class="auth-footer"><button class="btn-ghost" onclick="navigate('auth','login')"><i class="bi bi-arrow-left me-1"></i>Back to login</button></div>
+    </div>
+
+    <!-- RESET PASSWORD (direct) -->
+    <div id="sec-reset" class="auth-section hidden">
+      <div class="auth-card">
+        <div class="field"><label for="rp_email">Email</label><input id="rp_email" type="email" placeholder="you@example.com" autocomplete="email"></div>
+        <div class="field"><label for="rp_code">Reset code</label><input id="rp_code" placeholder="Enter code" autocomplete="one-time-code" inputmode="numeric"></div>
+        <div class="field"><label for="rp_password">New password</label><input id="rp_password" type="password" placeholder="Min. 8 characters" autocomplete="new-password"></div>
+        <button class="btn-primary w-100" id="resetBtn">Reset Password</button>
+      </div>
+      <div class="auth-footer"><button class="btn-ghost" onclick="navigate('auth','login')"><i class="bi bi-arrow-left me-1"></i>Back to login</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     PAGE: DASHBOARD (authenticated)
+     ═══════════════════════════════════════════════════════ -->
+<div id="page-dashboard" class="hidden">
+  <!-- SIDEBAR -->
+  <aside class="dash-sidebar" id="dashSidebar">
+    <div class="sidebar-top">
+      <a class="sidebar-logo" href="#" onclick="navigate('dashboard','account');return false;">
+        <span class="dash-logo-icon"><i class="bi bi-shield-lock-fill"></i></span>
+        <span class="sidebar-logo-text">Lupa ID</span>
+      </a>
+      <nav class="sidebar-nav">
+        <button class="sidebar-tab active" data-dash="account">
+          <i class="bi bi-person"></i>
+          <span class="sidebar-tab-text">Account</span>
+        </button>
+        <button class="sidebar-tab" data-dash="change">
+          <i class="bi bi-gear"></i>
+          <span class="sidebar-tab-text">Settings</span>
+        </button>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="dash-main">
+    <header class="dash-topbar">
+      <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="bi bi-list"></i>
+      </button>
+      <h1 class="dash-topbar-title" id="dashTopbarTitle">My Account</h1>
+    </header>
+
+    <div class="dash-body">
+      <!-- ACCOUNT -->
+      <div id="dash-account" class="dash-section">
+        <div class="dash-card hidden" id="accountCard" aria-busy="false">
+          <h2>My Account</h2>
+          <p class="subtitle">Your account details</p>
+          <div id="account_info"></div>
+        </div>
+        <div class="dash-card" id="accountSkeleton" aria-hidden="true">
+          <div class="skeleton skeleton-title"></div>
+          <div class="skeleton skeleton-subtitle"></div>
+          <div class="detail-skeleton">
+            <div class="skeleton skeleton-icon"></div>
+            <div class="skeleton-detail-wrap">
+              <div class="skeleton skeleton-line label"></div>
+              <div class="skeleton skeleton-line value"></div>
+            </div>
+          </div>
+          <div class="detail-skeleton">
+            <div class="skeleton skeleton-icon"></div>
+            <div class="skeleton-detail-wrap">
+              <div class="skeleton skeleton-line label"></div>
+              <div class="skeleton skeleton-line value"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHANGE SETTINGS -->
+      <div id="dash-change" class="dash-section hidden">
+        <div class="dash-card ig-edit-card">
+          <div class="ig-profile-header">
+            <div class="ig-avatar">
+              <i class="bi bi-gear-fill"></i>
+            </div>
+            <div class="ig-profile-info">
+              <span class="ig-username-display">Settings</span>
+            </div>
+          </div>
+
+          <div class="ig-fields">
+            <button type="button" class="ig-menu-row" id="openCredentialsBtn">
+              <div class="ig-menu-icon"><i class="bi bi-person-gear"></i></div>
+              <div class="ig-menu-text">
+                <span class="ig-menu-title">Change Credentials</span>
+                <span class="ig-menu-sub">Update your username or email</span>
+              </div>
+              <i class="bi bi-chevron-right ig-menu-chevron"></i>
+            </button>
+            <button type="button" class="ig-menu-row" id="openPasswordBtn">
+              <div class="ig-menu-icon"><i class="bi bi-lock"></i></div>
+              <div class="ig-menu-text">
+                <span class="ig-menu-title">Change Password</span>
+                <span class="ig-menu-sub">Update your password</span>
+              </div>
+              <i class="bi bi-chevron-right ig-menu-chevron"></i>
+            </button>
+            <button type="button" class="ig-menu-row" id="openThemeBtn">
+              <div class="ig-menu-icon"><i class="bi bi-palette"></i></div>
+              <div class="ig-menu-text">
+                <span class="ig-menu-title">Theme</span>
+                <span class="ig-menu-sub">Switch between light and dark</span>
+              </div>
+              <i class="bi bi-chevron-right ig-menu-chevron"></i>
+            </button>
+            <button type="button" class="ig-menu-row ig-menu-row-danger" id="openDeleteBtn">
+              <div class="ig-menu-icon"><i class="bi bi-trash"></i></div>
+              <div class="ig-menu-text">
+                <span class="ig-menu-title">Delete Account</span>
+                <span class="ig-menu-sub">Permanently delete your account</span>
+              </div>
+              <i class="bi bi-chevron-right ig-menu-chevron"></i>
+            </button>
+            <button type="button" class="ig-menu-row ig-menu-row-danger" id="logoutBtn">
+              <div class="ig-menu-icon"><i class="bi bi-box-arrow-right"></i></div>
+              <div class="ig-menu-text">
+                <span class="ig-menu-title">Log Out</span>
+                <span class="ig-menu-sub">Sign out of your account</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHANGE CREDENTIALS -->
+      <div id="dash-credentials" class="dash-section hidden">
+        <div class="dash-card ig-edit-card">
+          <input id="c_token" type="hidden">
+
+          <div class="ig-profile-header">
+            <button type="button" class="back-btn" id="backCredentialsBtn" aria-label="Back">
+              <i class="bi bi-arrow-left"></i>
+            </button>
+            <div class="ig-avatar">
+              <i class="bi bi-person-fill"></i>
+            </div>
+            <div class="ig-profile-info">
+              <span class="ig-username-display" id="igUsernameDisplay">user</span>
+            </div>
+          </div>
+
+          <div class="ig-fields">
+            <div class="ig-field-row">
+              <label for="c_username">Username</label>
+              <div class="ig-field-input">
+                <input id="c_username" placeholder="Your username">
+              </div>
+            </div>
+            <div class="ig-field-row">
+              <label for="c_email">Email</label>
+              <div class="ig-field-input">
+                <input id="c_email" type="email" placeholder="Your email">
+              </div>
+            </div>
+          </div>
+
+          <div class="ig-actions">
+            <button class="ig-save-btn" id="changeBtn">Submit</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- THEME -->
+      <div id="dash-theme" class="dash-section hidden">
+        <div class="dash-card ig-edit-card">
+          <div class="ig-profile-header">
+            <button type="button" class="back-btn" id="backThemeBtn" aria-label="Back">
+              <i class="bi bi-arrow-left"></i>
+            </button>
+            <div class="ig-avatar">
+              <i class="bi bi-palette"></i>
+            </div>
+            <div class="ig-profile-info">
+              <span class="ig-username-display">Theme</span>
+            </div>
+          </div>
+
+          <div class="ig-fields">
+            <button type="button" class="ig-menu-row theme-select-row" id="themeLight">
+              <div class="ig-menu-icon"><i class="bi bi-sun-fill"></i></div>
+              <div class="ig-menu-text">
+                <span class="ig-menu-title">Light</span>
+                <span class="ig-menu-sub">Bright and clean</span>
+              </div>
+              <i class="bi bi-check-lg ig-menu-check"></i>
+            </button>
+            <button type="button" class="ig-menu-row theme-select-row" id="themeDark">
+              <div class="ig-menu-icon"><i class="bi bi-moon-fill"></i></div>
+              <div class="ig-menu-text">
+                <span class="ig-menu-title">Dark</span>
+                <span class="ig-menu-sub">Low-light friendly</span>
+              </div>
+              <i class="bi bi-check-lg ig-menu-check"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHANGE PASSWORD -->
+      <div id="dash-password" class="dash-section hidden">
+        <div class="dash-card ig-edit-card">
+          <input id="p_token" type="hidden">
+
+          <div class="ig-profile-header">
+            <button type="button" class="back-btn" id="backPasswordBtn" aria-label="Back">
+              <i class="bi bi-arrow-left"></i>
+            </button>
+            <div class="ig-avatar">
+              <i class="bi bi-lock-fill"></i>
+            </div>
+            <div class="ig-profile-info">
+              <span class="ig-username-display" id="igPasswordDisplay">user</span>
+            </div>
+          </div>
+
+          <div class="ig-fields">
+            <div class="ig-field-row">
+              <label for="p_oldpass">Old Password</label>
+              <div class="ig-field-input">
+                <input id="p_oldpass" type="password" placeholder="Current password" autocomplete="current-password">
+              </div>
+            </div>
+            <div class="ig-field-row">
+              <label for="p_newpass">New Password</label>
+              <div class="ig-field-input">
+                <input id="p_newpass" type="password" placeholder="Min. 8 characters" autocomplete="new-password">
+              </div>
+            </div>
+          </div>
+
+          <div class="ig-actions">
+            <button class="ig-save-btn" id="passwordBtn">Submit</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- DELETE -->
+      <div id="dash-delete" class="dash-section hidden">
+        <div class="dash-card ig-edit-card">
+          <input id="d_token" type="hidden">
+
+          <div class="ig-profile-header">
+            <button type="button" class="back-btn" id="backDeleteBtn" aria-label="Back">
+              <i class="bi bi-arrow-left"></i>
+            </button>
+            <div class="ig-avatar ig-avatar-danger">
+              <i class="bi bi-trash"></i>
+            </div>
+            <div class="ig-profile-info">
+              <span class="ig-username-display">Delete Account</span>
+            </div>
+          </div>
+
+          <div class="ig-fields">
+            <div class="ig-field-row">
+              <label for="d_password">Password</label>
+              <div class="ig-field-input">
+                <input id="d_password" type="password" placeholder="Enter your password to confirm" autocomplete="current-password">
+              </div>
+            </div>
+          </div>
+
+          <p class="delete-warning"><i class="bi bi-exclamation-triangle-fill me-1"></i>This action is permanent and cannot be undone.</p>
+
+          <div class="ig-actions">
+            <button class="btn-outline-danger" id="deleteBtn">Delete My Account</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── RESET PASSWORD MODAL ──────────────────────────── -->
+<div class="modal fade" id="resetModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Reset Password</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div class="field mb-3"><label for="m_email">Email</label><input id="m_email" readonly class="email-readonly"></div>
+        <div class="field mb-3"><label for="m_code">Reset code</label><input id="m_code" placeholder="Enter code" autocomplete="one-time-code" inputmode="numeric"></div>
+        <div class="field mb-3"><label for="m_password">New password</label><input id="m_password" type="password" placeholder="Min. 8 characters" autocomplete="new-password"></div>
+        <button class="btn-primary w-100" id="modalResetBtn">Reset Password</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── DELETE CONFIRMATION MODAL ────────────────────── -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content delete-confirm-modal">
+      <div class="modal-header delete-confirm-header">
+        <h5 class="modal-title"><i class="bi bi-exclamation-triangle-fill me-2"></i>Confirm Deletion</h5>
+      </div>
+      <div class="modal-body">
+        <p class="delete-confirm-text">This action is <strong>permanent</strong> and cannot be undone. All your data will be lost.</p>
+        <p class="delete-confirm-instruction">Type <strong>CONFIRM</strong> below to proceed:</p>
+        <div class="field">
+          <input id="dc_confirm" class="delete-confirm-input" placeholder='Type "CONFIRM"' autocomplete="off">
+        </div>
+        <div class="d-flex gap-2 mt-3">
+          <button class="btn-cancel" data-bs-dismiss="modal" style="flex:1">Cancel</button>
+          <button class="btn-delete-confirm" id="deleteConfirmBtn" style="flex:1">Delete Forever</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── LOGOUT CONFIRMATION MODAL ────────────────────── -->
+<div class="modal fade" id="logoutConfirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content logout-confirm-modal">
+      <div class="modal-header logout-confirm-header">
+        <h5 class="modal-title"><i class="bi bi-box-arrow-right me-2"></i>Log Out</h5>
+      </div>
+      <div class="modal-body">
+        <p class="logout-confirm-text">Are you sure you want to log out of your account?</p>
+        <div class="d-flex gap-2 mt-3">
+          <button class="btn-cancel" data-bs-dismiss="modal" style="flex:1">Cancel</button>
+          <button class="btn-logout-confirm" id="logoutConfirmBtn" style="flex:1">Log Out</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── POPUP CONTAINER ─────────────────────────────── -->
+<div id="popupContainer" class="popup-container"></div>
+
+<!-- ── TOAST ──────────────────────────────────────────── -->
+<div class="toast-wrap">
+  <div id="appToast" class="toast" role="alert" aria-live="polite" aria-atomic="true">
+    <div class="toast-body"><i class="toast-icon bi"></i><span></span></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="api.js"></script>
+<script>
+document.querySelectorAll('input[type="password"]').forEach(input => {
+  const wrap = document.createElement('span');
+  wrap.style.position = 'relative';
+  wrap.style.display = 'block';
+  wrap.style.width = '100%';
+  input.parentNode.insertBefore(wrap, input);
+  wrap.appendChild(input);
+  input.style.width = '100%';
+  input.style.boxSizing = 'border-box';
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'toggle-pw';
+  btn.innerHTML = '<i class="bi bi-lock-fill"></i>';
+  btn.addEventListener('click', () => {
+    const isPassword = input.type === 'password';
+    input.type = isPassword ? 'text' : 'password';
+    btn.innerHTML = isPassword ? '<i class="bi bi-unlock-fill"></i>' : '<i class="bi bi-lock-fill"></i>';
+  });
+  wrap.appendChild(btn);
+});
+</script>
+<script src="script.js"></script>
+</body>
+</html>

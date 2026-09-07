@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 - Page Not Found</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('theme');
+        if (saved === 'dark' || (!saved && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <style>
+    #page-404 {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+    #page-404::before {
+      content: '';
+      position: absolute;
+      width: 480px;
+      height: 480px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(99,102,241,0.16), transparent 70%);
+      filter: blur(70px);
+      top: -180px;
+      right: -140px;
+      pointer-events: none;
+    }
+    #page-404::after {
+      content: '';
+      position: absolute;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(16,185,129,0.12), transparent 70%);
+      filter: blur(70px);
+      bottom: -160px;
+      left: -160px;
+      pointer-events: none;
+    }
+    .page-404-body {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 2rem;
+      position: relative;
+      z-index: 1;
+    }
+    .page-404-dialog {
+      text-align: center;
+      max-width: 480px;
+    }
+    .page-404-code {
+      font-size: clamp(4.5rem, 14vw, 8rem);
+      font-weight: 800;
+      letter-spacing: -0.05em;
+      line-height: 1;
+      background: linear-gradient(90deg, var(--primary), #22C55E);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: fadeUp 0.6s ease-out;
+    }
+    .page-404-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--fg);
+      margin: 1rem 0 0.5rem;
+      animation: fadeUp 0.6s ease-out 0.08s both;
+    }
+    .page-404-text {
+      font-size: 0.9375rem;
+      color: var(--fg-muted);
+      line-height: 1.7;
+      max-width: 380px;
+      margin: 0 auto 2rem;
+      animation: fadeUp 0.6s ease-out 0.16s both;
+    }
+    .page-404-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeUp 0.6s ease-out 0.24s both;
+    }
+  </style>
+</head>
+<body>
+<div id="page-404">
+  <nav class="home-nav">
+    <a class="home-logo" href="/">
+      <span class="home-logo-icon"><i class="bi bi-shield-lock-fill"></i></span>
+      Lupa ID
+    </a>
+    <div class="home-nav-actions">
+      <a class="btn-nav btn-nav-fill" style="text-decoration:none;" href="/">Go home</a>
+    </div>
+  </nav>
+
+  <div class="page-404-body">
+    <div class="page-404-dialog">
+      <div class="page-404-code">404</div>
+      <h1 class="page-404-title">Page not found</h1>
+      <p class="page-404-text">The page you're looking for doesn't exist or has been moved. Let's get you back on track.</p>
+      <div class="page-404-actions">
+        <button class="btn-hero-primary" onclick="window.location.href='/'"><i class="bi bi-house-door-fill me-2"></i>Back to home</button>
+        <button class="btn-hero-ghost" onclick="history.back()">Go back</button>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
