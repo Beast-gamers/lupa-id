@@ -184,6 +184,25 @@ function handleRedirectParams() {
     return;
   }
 
+  /* ── Return from Google OAuth: ?g_token=JWT or ?g_error=ERR ── */
+  if (params.get('g_token') || params.get('g_error')) {
+    const token = params.get('g_token');
+    const err = params.get('g_error');
+    if (token) {
+      setToken(token);
+      fillTokens();
+      history.replaceState(null, '', window.location.pathname);
+      navigate('dashboard', 'account');
+      fetchAccountUI();
+      showToast('Signed in with Google!', 'success');
+    } else {
+      history.replaceState(null, '', window.location.pathname);
+      showPopup('Google sign-in failed: ' + (err || 'Unknown error'), true);
+      navigate('auth', 'login');
+    }
+    return;
+  }
+
   /* ── Return from forgot-password page: #fe=EMAIL ── */
   if (hash && hash.startsWith('#fe=')) {
     const raw = decodeURIComponent(hash.substring(4));
@@ -404,6 +423,25 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* ── LOGIN ── */
+  const googleLoginBtn = document.getElementById('googleLoginBtn');
+  if (googleLoginBtn) {
+    googleLoginBtn.addEventListener('click', async () => {
+      setLoading('googleLoginBtn', true);
+      try {
+        const data = await AuthAPI.googleLogin();
+        if (data.success && data.url) {
+          window.location.href = data.url;
+          return;
+        } else {
+          showPopup(data.message || 'Google login unavailable', true);
+        }
+      } catch {
+        showPopup('Network error', true);
+      }
+      setLoading('googleLoginBtn', false);
+    });
+  }
+
   const loginBtn = document.getElementById('loginBtn');
   if (loginBtn) {
     loginBtn.addEventListener('click', async () => {

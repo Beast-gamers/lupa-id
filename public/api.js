@@ -18,6 +18,11 @@ const AuthAPI = (() => {
     login: (identifier, password) => post(`${BASE}/login`, { identifier, password }),
     forgotPassword: (email) => post(`${BASE}/forgotpassword`, { email }),
     resetPassword: (email, code, password) => post(`${BASE}/resetpassword`, { email, code, password }),
+    googleLogin: async () => {
+      const redirect = encodeURIComponent(window.location.origin);
+      const res = await fetch(`${BASE}/google?redirect=${redirect}`);
+      return res.json();
+    },
     fetchAccount: async (token) => {
       const res = await fetch(`${BASE}/fetch?token=${encodeURIComponent(token)}`);
       return res.json();

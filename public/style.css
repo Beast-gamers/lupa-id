@@ -140,6 +140,49 @@ body {
 }
 .btn-outline-danger:hover { background: var(--danger); color: white; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(239,68,68,0.3); }
 
+/* ── GOOGLE BUTTON ────────────────────────────────── */
+.btn-google {
+  height: 46px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--white);
+  color: var(--fg);
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  padding: 0 1.5rem;
+}
+.btn-google:hover { border-color: var(--primary); background: var(--border-light); box-shadow: 0 4px 16px rgba(99,102,241,0.15); transform: translateY(-1px); }
+.btn-google:active { transform: translateY(0); }
+.btn-google:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-google .google-icon { flex-shrink: 0; }
+
+/* ── AUTH DIVIDER ────────────────────────────────── */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.5rem 0 1.25rem;
+  color: var(--fg-dim);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
 .spinner-sm { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; }
 
 /* ── FORM FIELDS ──────────────────────────────────── */
