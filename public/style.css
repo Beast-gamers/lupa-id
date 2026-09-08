@@ -1023,7 +1023,7 @@ body {
    card are the same size in every state. */
 #dash-account {
   position: relative;
-  width: min(300px, 100%);
+  width: min(340px, 100%);
 }
 /* Keep the real card in flow (invisible) while the skeleton shows so the
    section keeps the card's height and the overlay can match it 1:1. */
