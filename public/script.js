@@ -124,6 +124,15 @@ function getToken() { return localStorage.getItem('token'); }
 function setToken(t) { localStorage.setItem('token', t); }
 function removeToken() { localStorage.removeItem('token'); localStorage.removeItem('user'); }
 
+function isInvalidToken(data) {
+  return !!data && !data.success && (data.message === 'Invalid token' || data.message === 'Token expired');
+}
+function handleInvalidToken() {
+  removeToken();
+  showToast('Invalid token', 'error');
+  navigate('home');
+}
+
 function setCookie(name, value, minutes) {
   const expires = new Date(Date.now() + minutes * 60 * 1000).toUTCString();
   document.cookie = name + '=' + encodeURIComponent(value) + ';expires=' + expires + ';path=/;SameSite=Lax';
@@ -266,6 +275,7 @@ async function fetchAccountUI() {
         <div class="detail-row"><div class="detail-icon"><i class="bi bi-envelope"></i></div><div><div class="detail-label">Email</div><div class="detail-value">${data.user.email}</div></div></div>`;
       showCard();
     } else {
+      if (isInvalidToken(data)) { handleInvalidToken(); return; }
       showPopup(data.message || 'Failed to load account', true);
       if (skeleton) skeleton.classList.add('hidden');
       removeToken();
@@ -602,6 +612,7 @@ document.addEventListener("DOMContentLoaded", () => {
           results.push({ type: 'email', value: newEmail, orig: origEmail, ...emailData });
         }
         if (results.length) {
+          if (results.some(r => isInvalidToken(r))) { handleInvalidToken(); setLoading('changeBtn', false); return; }
           const allSuccess = results.every(r => r.success);
           const failures = results.filter(r => !r.success);
           if (allSuccess) {
@@ -638,6 +649,7 @@ document.addEventListener("DOMContentLoaded", () => {
       setLoading('passwordBtn', true);
       try {
         const data = await AuthAPI.change(token, 'password', newPass, oldPass);
+        if (isInvalidToken(data)) { handleInvalidToken(); return; }
         showPopup(data.message || 'Password change failed', !data.success);
         if (data.success) {
           showToast('Password changed!', 'success');
@@ -664,6 +676,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const token = getToken();
         if (!token) { showPopup('Not authenticated', true); setLoading('deleteBtn', false); return; }
         const data = await AuthAPI.verifyPassword(token, password);
+        if (isInvalidToken(data)) { handleInvalidToken(); setLoading('deleteBtn', false); return; }
         if (data.success) {
           _pendingDeletePassword = password;
           document.getElementById('dc_confirm').value = '';
@@ -689,6 +702,7 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         const token = getToken();
         const data = await AuthAPI.deleteAccount(token, _pendingDeletePassword, cv);
+        if (isInvalidToken(data)) { handleInvalidToken(); setLoading('deleteConfirmBtn', false); return; }
         showPopup(data.message || 'Delete failed', !data.success);
         if (data.success) {
           _pendingDeletePassword = '';
