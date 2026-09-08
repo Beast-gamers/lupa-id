@@ -433,24 +433,25 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* ── LOGIN ── */
-  const googleLoginBtn = document.getElementById('googleLoginBtn');
-  if (googleLoginBtn) {
-    googleLoginBtn.addEventListener('click', async () => {
-      setLoading('googleLoginBtn', true);
-      try {
-        const data = await AuthAPI.googleLogin();
-        if (data.success && data.url) {
-          window.location.href = data.url;
-          return;
-        } else {
-          showPopup(data.message || 'Google login unavailable', true);
-        }
-      } catch {
-        showPopup('Network error', true);
+  const startGoogleOAuth = async (btnId) => {
+    setLoading(btnId, true);
+    try {
+      const data = await AuthAPI.googleLogin();
+      if (data.success && data.url) {
+        window.location.href = data.url;
+        return;
+      } else {
+        showPopup(data.message || 'Google login unavailable', true);
       }
-      setLoading('googleLoginBtn', false);
-    });
-  }
+    } catch {
+      showPopup('Network error', true);
+    }
+    setLoading(btnId, false);
+  };
+  const googleLoginBtn = document.getElementById('googleLoginBtn');
+  if (googleLoginBtn) googleLoginBtn.addEventListener('click', () => startGoogleOAuth('googleLoginBtn'));
+  const googleRegisterBtn = document.getElementById('googleRegisterBtn');
+  if (googleRegisterBtn) googleRegisterBtn.addEventListener('click', () => startGoogleOAuth('googleRegisterBtn'));
 
   const loginBtn = document.getElementById('loginBtn');
   if (loginBtn) {
