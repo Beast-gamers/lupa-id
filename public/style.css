@@ -1309,8 +1309,9 @@ body {
 
 /* ── TOAST ────────────────────────────────────────── */
 .toast-wrap { position: fixed; top: 1.25rem; right: 1.25rem; z-index: 1090; }
-.toast { border-radius: 14px; border: none; box-shadow: var(--shadow-lg); background: white; }
-.toast-body { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; font-weight: 500; padding: 0.75rem 1rem; }
+.toast { border-radius: 14px; border: none; box-shadow: var(--shadow-lg); background: white; position: relative; }
+.toast-body { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; font-weight: 500; padding: 0.75rem 2.5rem 0.75rem 1rem; }
+.toast-close { position: absolute; top: 0.875rem; right: 0.875rem; width: 0.7rem; height: 0.7rem; font-size: 0.7rem; }
 
 /* ── DELETE CONFIRM MODAL ─────────────────────────── */
 .delete-confirm-modal { border-radius: 18px; border: none; box-shadow: var(--shadow-lg); overflow: hidden; }
