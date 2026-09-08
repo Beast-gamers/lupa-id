@@ -1,0 +1,46 @@
+# Lupa ID
+
+> Lupa ID is the identity and authentication hub for the Lupa ecosystem. Register and verify once, then manage every Lupa project with a single secure master account.
+
+App URL: https://lupa-id.vercel.app/
+API base: https://account-server-nine.vercel.app/api/auth
+
+## What is Lupa ID?
+
+- Lupa ID is a centralized identity and authentication platform (single sign-on style) for the Lupa ecosystem.
+- One master account is shared across every Lupa project.
+- Accounts are email-verified and password-protected.
+- Users can sign in by username or email, or via Google OAuth.
+- JWT tokens are used for authentication (30-day expiry).
+
+## Key features
+
+- **Registration**: create an account with a username, email, and password (minimum 8 characters; must include uppercase, lowercase, number, and special character; username is alphanumeric with `_` and `-`, minimum 5 characters).
+- **Email verification**: 6-digit OTP code sent to the user's email, with a resend option.
+- **Login**: username or email + password, or "Sign in with Google".
+- **Account dashboard**: view username and email.
+- **Settings**: change username or email, change password (requires current password), switch between light and dark theme, delete account (requires password and typing CONFIRM), and log out.
+- **Password reset**: forgotten-password flow with an emailed code.
+
+## Deep links
+
+- [Home page](https://lupa-id.vercel.app/)
+- [Sign in page](https://lupa-id.vercel.app/#login)
+- [Sign up page](https://lupa-id.vercel.app/#signup)
+
+## API reference (auth)
+
+Base URL: `https://account-server-nine.vercel.app/api/auth`
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| POST | /register | Register with username + email + password |
+| POST | /verify | Verify email with 6-digit OTP code |
+| POST | /login | Login with identifier (username or email) + password; returns JWT |
+| GET | /google | Initiate Google OAuth (returns redirect URL) |
+| GET/POST | /google/callback | Google OAuth callback |
+| GET | /fetch | Fetch account info by JWT token |
+| POST | /change | Change username, email, or password |
+| POST | /verifypassword | Verify password before account deletion |
+| POST | /delete | Delete account (requires password + CONFIRM) |
+| POST | /resetpassword | Reset password via emailed code |
