@@ -1019,13 +1019,16 @@ body {
 .skeleton-line.value { width: 55%; height: 1.05rem; }
 
 /* Skeleton overlays the account card exactly (no layout shift) */
-#dash-account { position: relative; }
+#dash-account {
+  position: relative;
+  width: min(520px, 100%);
+}
 #accountSkeleton {
   position: absolute;
   top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: min(520px, calc(100vw - 4rem));
+  width: 100%;
 }
 
 .dash-card h2 {
