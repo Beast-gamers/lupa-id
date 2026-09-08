@@ -177,6 +177,13 @@ function handleRedirectParams() {
   const fpEmail = params.get('fp_email');
   const hash = window.location.hash;
 
+  /* ── Direct routes: /#signup and /#login ── */
+  if (hash === '#signup' || hash === '#login') {
+    navigate('auth', hash === '#signup' ? 'register' : 'login');
+    history.replaceState(null, '', window.location.pathname);
+    return;
+  }
+
   /* ── Return from verify page: #ve=EMAIL ── */
   if (hash && hash.startsWith('#ve=')) {
     const raw = decodeURIComponent(hash.substring(4));
@@ -324,8 +331,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   initTheme();
 
-  handleRedirectParams();
-
   /* If logged out but a pending verification email exists (e.g. after a tab
      reload wiped the URL hash), resume the verify flow from the cookie. */
   const pendingEmail = getCookie('register_email');
@@ -344,6 +349,8 @@ document.addEventListener("DOMContentLoaded", () => {
     fillTokens();
     fetchAccountUI();
   }
+
+  handleRedirectParams();
 
   /* ── REGISTER ── */
   const registerBtn = document.getElementById('registerBtn');
