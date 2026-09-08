@@ -1019,9 +1019,12 @@ body {
 .skeleton-line.value { width: 55%; height: 1.05rem; }
 
 /* Skeleton overlays the account card exactly (no layout shift) */
-#dash-account {
-  position: relative;
-  width: min(520px, 100%);
+#dash-account { position: relative; }
+/* Keep the real card in flow (invisible) while the skeleton shows so the
+   section keeps the card's width and the overlay can match it 1:1. */
+#accountCard.hidden {
+  display: block !important;
+  visibility: hidden;
 }
 #accountSkeleton {
   position: absolute;

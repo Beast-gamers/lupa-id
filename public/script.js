@@ -241,13 +241,31 @@ function handleRedirectParams() {
 }
 
 /* ── FETCH ACCOUNT ──────────────────────────────────── */
+let skeletonWidth = null;
+window.addEventListener('resize', () => { captureCardWidth(); applySkeletonWidth(); });
+function captureCardWidth(force) {
+  const accountCard = document.getElementById('accountCard');
+  if (accountCard && (force || !accountCard.classList.contains('hidden'))) {
+    const w = accountCard.getBoundingClientRect().width;
+    if (w > 0) skeletonWidth = w;
+  }
+}
+function applySkeletonWidth() {
+  const skeleton = document.getElementById('accountSkeleton');
+  if (skeleton && !skeleton.classList.contains('hidden') && skeletonWidth) {
+    skeleton.style.width = skeletonWidth + 'px';
+  }
+}
 async function fetchAccountUI() {
   const token = getToken();
   const infoDiv = document.getElementById('account_info');
   const accountCard = document.getElementById('accountCard');
   const skeleton = document.getElementById('accountSkeleton');
-  const showSkeleton = () => { if (skeleton) skeleton.classList.remove('hidden'); if (accountCard) accountCard.classList.add('hidden'); };
-  const showCard = () => { if (skeleton) skeleton.classList.add('hidden'); if (accountCard) accountCard.classList.remove('hidden'); };
+  const showSkeleton = () => { if (skeleton) { skeleton.classList.remove('hidden'); applySkeletonWidth(); } if (accountCard) accountCard.classList.add('hidden'); };
+  const showCard = () => {
+    if (accountCard) { captureCardWidth(true); accountCard.classList.remove('hidden'); }
+    if (skeleton) { applySkeletonWidth(); skeleton.classList.add('hidden'); }
+  };
   showSkeleton();
   if (!token) { showPopup('Not logged in', true); return; }
   try {
