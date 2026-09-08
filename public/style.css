@@ -1018,10 +1018,15 @@ body {
 .skeleton-line.label { width: 35%; height: 0.825rem; }
 .skeleton-line.value { width: 55%; height: 1.05rem; }
 
-/* Skeleton overlays the account card exactly (no layout shift) */
-#dash-account { position: relative; }
+/* Skeleton overlays the account card exactly (no layout shift).
+   The account tab has a stable width so the skeleton and the loaded
+   card are the same size in every state. */
+#dash-account {
+  position: relative;
+  width: min(300px, 100%);
+}
 /* Keep the real card in flow (invisible) while the skeleton shows so the
-   section keeps the card's width and the overlay can match it 1:1. */
+   section keeps the card's height and the overlay can match it 1:1. */
 #accountCard.hidden {
   display: block !important;
   visibility: hidden;
@@ -1450,6 +1455,9 @@ body {
     width: 100%;
     min-width: 0;
     max-width: 520px;
+  }
+  #dash-account {
+    width: 100%;
   }
 
   .ig-field-row {
