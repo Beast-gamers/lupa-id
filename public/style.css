@@ -1440,6 +1440,12 @@ body {
     height: 56px;
   }
   .ig-avatar i { font-size: 1.5rem; }
+  .dash-body > .dash-section {
+    width: 100%;
+    min-width: 0;
+    max-width: 520px;
+  }
+
   .ig-field-row {
     flex-direction: column;
     align-items: flex-start;
@@ -1448,6 +1454,15 @@ body {
   }
   .ig-field-row > label {
     width: auto;
+  }
+  .ig-field-row .ig-field-input {
+    width: 100%;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .delete-warning {
+    padding-right: 1.25rem;
+    padding-left: 1.25rem;
   }
   .ig-actions {
     padding: 0.75rem 1.25rem 1rem;
