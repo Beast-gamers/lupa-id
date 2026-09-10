@@ -1,6 +1,15 @@
 /* ── DEBUG CONFIG ─────────────────────────────────────── */
 const BASE_URL = "https://account-server-nine.vercel.app";
 
+/* Current signed-in user's email, populated when account is fetched */
+let currentUserEmail = null;
+
+function startForgotFlow(email) {
+  const returnBase = window.location.origin + window.location.pathname;
+  const returnUrl = returnBase + '#fe=' + encodeURIComponent(email);
+  window.location.href = `https://forgot-password-five.vercel.app/forgot?email=${encodeURIComponent(email)}&url=${encodeURIComponent(returnUrl)}`;
+}
+
 /* ── NAVIGATION ─────────────────────────────────────── */
 function navigate(page, section) {
   const pages = ['page-home', 'page-auth', 'page-dashboard'];
@@ -277,6 +286,7 @@ async function fetchAccountUI() {
       const cEmail = document.getElementById('c_email');
       if (cUsername) cUsername.value = data.user.username;
       if (cEmail) cEmail.value = data.user.email;
+      currentUserEmail = data.user.email;
       infoDiv.innerHTML = `
         <div class="detail-row"><div class="detail-icon"><i class="bi bi-person"></i></div><div><div class="detail-label">Username</div><div class="detail-value">${data.user.username}</div></div></div>
         <div class="detail-row"><div class="detail-icon"><i class="bi bi-envelope"></i></div><div><div class="detail-label">Email</div><div class="detail-value">${data.user.email}</div></div></div>`;
@@ -497,15 +507,17 @@ document.addEventListener("DOMContentLoaded", () => {
     forgotBtn.addEventListener('click', async () => {
       const email = document.getElementById('fp_email').value.trim();
       if (!email) { showPopup('Enter your email', true); return; }
-      setLoading('forgotBtn', true);
-      try {
-        const returnBase = window.location.origin + window.location.pathname;
-        const returnUrl = returnBase + '#fe=' + encodeURIComponent(email);
-        window.location.href = `https://forgot-password-five.vercel.app/forgot?email=${encodeURIComponent(email)}&url=${encodeURIComponent(returnUrl)}`;
-      } catch {
-        showPopup('Network error', true);
-      }
-      setLoading('forgotBtn', false);
+      startForgotFlow(email);
+    });
+  }
+
+  /* Forgot password from the Change Password tab in settings */
+  const passwordForgotLink = document.getElementById('passwordForgotLink');
+  if (passwordForgotLink) {
+    passwordForgotLink.addEventListener('click', () => {
+      const email = (currentUserEmail || (document.getElementById('c_email') || {}).value || '').trim();
+      if (!email) { showPopup('Unable to determine your email. View your account first.', true); return; }
+      startForgotFlow(email);
     });
   }
 

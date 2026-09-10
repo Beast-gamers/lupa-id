@@ -1273,6 +1273,13 @@ body {
 .ig-save-btn:active { transform: scale(0.98); }
 .ig-save-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
 
+.ig-forgot-row {
+  padding: 0 2rem 1.25rem;
+  display: flex;
+  justify-content: center;
+}
+.ig-forgot-row .btn-ghost { font-size: 0.8125rem; }
+
 /* ── DANGER ZONE ──────────────────────────────────── */
 .danger-card {
   background: var(--danger-bg);
