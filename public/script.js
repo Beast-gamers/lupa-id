@@ -604,7 +604,7 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         const data = await AuthAPI.resetPassword(email, code, password);
         showPopup(data.message || 'Reset failed', !data.success);
-        if (data.success) { deleteCookie('reset_email'); showToast('Password reset!', 'success'); setTimeout(() => showAuthSection('login'), 1200); }
+        if (data.success) { deleteCookie('reset_email'); removeToken(); showToast('Password reset!', 'success'); setTimeout(() => navigate('home'), 1200); }
       } catch {
         showPopup('Network error', true);
       }
@@ -626,11 +626,12 @@ document.addEventListener("DOMContentLoaded", () => {
         showPopup(data.message || 'Reset failed', !data.success);
         if (data.success) {
           deleteCookie('reset_email');
+          removeToken();
           showToast('Password reset!', 'success');
           setTimeout(() => {
             bootstrap.Modal.getInstance(document.getElementById('resetModal'))?.hide();
             history.replaceState(null, '', window.location.pathname);
-            if (!getToken()) showAuthSection('login');
+            navigate('home');
           }, 1500);
         }
       } catch {
