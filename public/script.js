@@ -255,10 +255,20 @@ function handleRedirectParams() {
     const raw = decodeURIComponent(hash.substring(4));
     const email = raw.split('?')[0];
     setCookie('reset_email', email, 10);
-    navigate('auth', 'reset');
-    const rpEmail = document.getElementById('rp_email');
-    rpEmail.value = email;
-    rpEmail.closest('.field').style.display = 'none';
+    if (getToken() && document.getElementById('resetModal')) {
+      /* Logged in (came from the Change Password tab): stay in the dashboard so the
+         tab and its history are preserved, and reset via the modal. */
+      navigate('dashboard', 'change');
+      openSubView('dash-password', 'Change Password');
+      document.getElementById('m_email').value = email;
+      new bootstrap.Modal(document.getElementById('resetModal')).show();
+      showToast('Reset code sent to ' + email + '!', 'success');
+    } else {
+      navigate('auth', 'reset');
+      const rpEmail = document.getElementById('rp_email');
+      rpEmail.value = email;
+      rpEmail.closest('.field').style.display = 'none';
+    }
     history.replaceState(null, '', window.location.pathname);
     return true;
   }
@@ -271,6 +281,11 @@ function handleRedirectParams() {
 
   if (fpEmail && success && message) {
     document.getElementById('m_email').value = fpEmail;
+    if (getToken() && document.getElementById('resetModal')) {
+      /* Logged in (came from the Change Password tab): stay in the dashboard. */
+      navigate('dashboard', 'change');
+      openSubView('dash-password', 'Change Password');
+    }
     showPopup(decodeURIComponent(message), success !== 'true');
     new bootstrap.Modal(document.getElementById('resetModal')).show();
     history.replaceState(null, '', window.location.pathname + '?fp_email=' + encodeURIComponent(fpEmail));
@@ -615,7 +630,7 @@ document.addEventListener("DOMContentLoaded", () => {
           setTimeout(() => {
             bootstrap.Modal.getInstance(document.getElementById('resetModal'))?.hide();
             history.replaceState(null, '', window.location.pathname);
-            showAuthSection('login');
+            if (!getToken()) showAuthSection('login');
           }, 1500);
         }
       } catch {
