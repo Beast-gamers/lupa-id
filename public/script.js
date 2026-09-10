@@ -5,6 +5,7 @@ const BASE_URL = "https://account-server-nine.vercel.app";
 let currentUserEmail = null;
 
 function startForgotFlow(email) {
+  setCookie('reset_email', email, 10);
   const returnBase = window.location.origin + window.location.pathname;
   const returnUrl = returnBase + '#fe=' + encodeURIComponent(email);
   window.location.href = `https://forgot-password-five.vercel.app/forgot?email=${encodeURIComponent(email)}&url=${encodeURIComponent(returnUrl)}`;
@@ -253,6 +254,7 @@ function handleRedirectParams() {
   if (hash && hash.startsWith('#fe=')) {
     const raw = decodeURIComponent(hash.substring(4));
     const email = raw.split('?')[0];
+    setCookie('reset_email', email, 10);
     navigate('auth', 'reset');
     const rpEmail = document.getElementById('rp_email');
     rpEmail.value = email;
@@ -388,6 +390,14 @@ document.addEventListener("DOMContentLoaded", () => {
       if (vEmail) {
         vEmail.value = pendingEmail;
         vEmail.closest('.field').style.display = 'none';
+      }
+    } else if (getCookie('reset_email')) {
+      /* Resume the forgot-password flow from the stored cookie. */
+      navigate('auth', 'reset');
+      const rpEmail = document.getElementById('rp_email');
+      if (rpEmail) {
+        rpEmail.value = getCookie('reset_email');
+        rpEmail.closest('.field').style.display = 'none';
       }
     } else if (last && last.page === 'auth' && ['register', 'login', 'verify', 'forgot', 'reset'].includes(last.section)) {
       /* Restore the last auth page the user was on (login/signup/etc.). */
@@ -556,6 +566,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  /* Resend the reset code from the reset-password section */
+  const resetResendLink = document.getElementById('resetResendLink');
+  if (resetResendLink) {
+    resetResendLink.addEventListener('click', () => {
+      const rpEmail = document.getElementById('rp_email');
+      const email = getCookie('reset_email') || (rpEmail ? rpEmail.value.trim() : '');
+      if (!email) { showAuthSection('forgot'); return; }
+      startForgotFlow(email);
+    });
+  }
+
   /* ── RESET PASSWORD ── */
   const resetBtn = document.getElementById('resetBtn');
   if (resetBtn) {
@@ -568,7 +589,7 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         const data = await AuthAPI.resetPassword(email, code, password);
         showPopup(data.message || 'Reset failed', !data.success);
-        if (data.success) { showToast('Password reset!', 'success'); setTimeout(() => showAuthSection('login'), 1200); }
+        if (data.success) { deleteCookie('reset_email'); showToast('Password reset!', 'success'); setTimeout(() => showAuthSection('login'), 1200); }
       } catch {
         showPopup('Network error', true);
       }
@@ -589,6 +610,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const data = await AuthAPI.resetPassword(email, code, password);
         showPopup(data.message || 'Reset failed', !data.success);
         if (data.success) {
+          deleteCookie('reset_email');
           showToast('Password reset!', 'success');
           setTimeout(() => {
             bootstrap.Modal.getInstance(document.getElementById('resetModal'))?.hide();
