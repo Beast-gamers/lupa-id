@@ -11,6 +11,22 @@ function startForgotFlow(email) {
 }
 
 /* ── NAVIGATION ─────────────────────────────────────── */
+const NAV_KEY = 'lupa_nav_history';
+function savePageState(page, section) {
+  try {
+    localStorage.setItem(NAV_KEY, JSON.stringify({ page: page || 'home', section: section || '' }));
+  } catch (e) {}
+}
+function getPageState() {
+  try {
+    const raw = localStorage.getItem(NAV_KEY);
+    if (!raw) return null;
+    const s = JSON.parse(raw);
+    if (s && typeof s.page === 'string') return s;
+  } catch (e) {}
+  return null;
+}
+
 function navigate(page, section) {
   const pages = ['page-home', 'page-auth', 'page-dashboard'];
   pages.forEach(p => document.getElementById(p).classList.add('hidden'));
@@ -23,6 +39,7 @@ function navigate(page, section) {
     showDashSection(section);
   }
   window.scrollTo(0, 0);
+  savePageState(page, section);
 }
 
 function showAuthSection(id) {
@@ -53,6 +70,7 @@ function showAuthSection(id) {
       subEl.textContent = s;
     }
   }
+  savePageState('auth', id);
 }
 
 function showDashSection(id) {
@@ -70,6 +88,7 @@ function showDashSection(id) {
   const titles = { account: 'My Account', change: 'Account Settings', password: 'Change Password', delete: 'Delete Account' };
   const titleEl = document.getElementById('dashTopbarTitle');
   if (titleEl) titleEl.textContent = titles[id] || '';
+  savePageState('dashboard', id);
 }
 
 function openSubView(secId, title) {
@@ -84,8 +103,10 @@ function openSubView(secId, title) {
   document.querySelectorAll('.sidebar-tab').forEach(b => b.classList.remove('active'));
   const tab = document.querySelector('.sidebar-tab[data-dash="change"]');
   if (tab) tab.classList.add('active');
-  const titleEl = document.getElementById('dashTopbarTitle');
+const titleEl = document.getElementById('dashTopbarTitle');
   if (titleEl) titleEl.textContent = title;
+  if (secId && secId.startsWith('dash-')) savePageState('dashboard', secId.replace('dash-', ''));
+
   window.scrollTo(0, 0);
 }
 
@@ -190,7 +211,7 @@ function handleRedirectParams() {
   if (hash === '#signup' || hash === '#login') {
     navigate('auth', hash === '#signup' ? 'register' : 'login');
     history.replaceState(null, '', window.location.pathname);
-    return;
+    return true;
   }
 
   /* ── Return from verify page: #ve=EMAIL ── */
@@ -206,7 +227,7 @@ function handleRedirectParams() {
     showPopup('Code sent! Check your inbox for the verification code.', false);
     showToast('Verification code sent!', 'success');
     history.replaceState(null, '', window.location.pathname);
-    return;
+    return true;
   }
 
   /* ── Return from Google OAuth: ?g_token=JWT or ?g_error=ERR ── */
@@ -225,7 +246,7 @@ function handleRedirectParams() {
       showPopup('Google sign-in failed: ' + (err || 'Unknown error'), true);
       navigate('auth', 'login');
     }
-    return;
+    return true;
   }
 
   /* ── Return from forgot-password page: #fe=EMAIL ── */
@@ -237,7 +258,7 @@ function handleRedirectParams() {
     rpEmail.value = email;
     rpEmail.closest('.field').style.display = 'none';
     history.replaceState(null, '', window.location.pathname);
-    return;
+    return true;
   }
 
   /* ── Return from forgot-password flow ── */
@@ -251,6 +272,7 @@ function handleRedirectParams() {
     showPopup(decodeURIComponent(message), success !== 'true');
     new bootstrap.Modal(document.getElementById('resetModal')).show();
     history.replaceState(null, '', window.location.pathname + '?fp_email=' + encodeURIComponent(fpEmail));
+    return true;
   } else if (success && message) {
     const msg = decodeURIComponent(message);
     const ok = success === 'true';
@@ -262,7 +284,9 @@ function handleRedirectParams() {
       showPopup(msg, true);
     }
     history.replaceState(null, '', window.location.pathname);
+    return true;
   }
+  return false;
 }
 
 /* ── FETCH ACCOUNT ──────────────────────────────────── */
@@ -341,26 +365,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
   initTheme();
 
-  /* If logged out but a pending verification email exists (e.g. after a tab
-     reload wiped the URL hash), resume the verify flow from the cookie. */
-  const pendingEmail = getCookie('register_email');
-  if (!getToken() && pendingEmail) {
-    navigate('auth', 'verify');
-    const vEmail = document.getElementById('v_email');
-    if (vEmail) {
-      vEmail.value = pendingEmail;
-      vEmail.closest('.field').style.display = 'none';
+  /* URL-driven redirects (verify/forgot/Google/direct #signup & #login routes)
+     take priority; returns true when one of them decided navigation. */
+  const redirected = handleRedirectParams();
+
+  if (!redirected) {
+    const pendingEmail = getCookie('register_email');
+    const token = getToken();
+    const last = getPageState();
+
+    /* If already logged in, skip home (restore the last dashboard tab). */
+    if (token) {
+      const DASH_TABS = ['account', 'change', 'credentials', 'password', 'theme', 'delete'];
+      const section = (last && last.page === 'dashboard' && DASH_TABS.includes(last.section)) ? last.section : 'account';
+      navigate('dashboard', section);
+      fillTokens();
+      fetchAccountUI();
+    } else if (pendingEmail) {
+      /* Resume the verify flow from the stored cookie (like the OTP flow does). */
+      navigate('auth', 'verify');
+      const vEmail = document.getElementById('v_email');
+      if (vEmail) {
+        vEmail.value = pendingEmail;
+        vEmail.closest('.field').style.display = 'none';
+      }
+    } else if (last && last.page === 'auth' && ['register', 'login', 'verify', 'forgot', 'reset'].includes(last.section)) {
+      /* Restore the last auth page the user was on (login/signup/etc.). */
+      navigate('auth', last.section);
+    } else {
+      navigate('home');
     }
   }
-
-  /* If already logged in, skip home */
-  if (getToken()) {
-    navigate('dashboard', 'account');
-    fillTokens();
-    fetchAccountUI();
-  }
-
-  handleRedirectParams();
 
   /* ── REGISTER ── */
   const registerBtn = document.getElementById('registerBtn');
